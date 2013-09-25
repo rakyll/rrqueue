@@ -2,28 +2,30 @@
 
 `rrqueue` is a priority queue implementation with round-robin like scheduling to consume the enqueued items. It retrieves a single item from each priority queue on each tick and process the item with the provided func. Equal time slices are allocated for each queue on each tick, you're expected to put less items to high priority queues to avoid starvation. 
 
-    import (
-        "github.com/rakyll/rrqueue"
-    )
+~~~ go
+import (
+    "github.com/rakyll/rrqueue"
+)
 
-    // Create a new rrqueue with 5 priority queues
-    q := rrqueue.New(5)
-    
-    // Optionally set how often consumer should tick
-    q.TickInterval = time.Millisecond
-    
-    // Set a function to process queued items
-    q.Fn = func(item interface{}) {
-      log.Println(item)
-    }
+// Create a new rrqueue with 5 priority queues
+q := rrqueue.New(5)
 
-    // Enqueue some items
-    q.Enqueue(P0, "some p0 item")
-    q.Enqueue(P1, "a p1 item")
-    q.Enqueue(P1, "another p1 item")
+// Optionally set how often consumer should tick
+q.TickInterval = time.Millisecond
 
-    // Start to consume
-    q.Start()
+// Set a function to process queued items
+q.Fn = func(item interface{}) {
+  log.Println(item)
+}
+
+// Enqueue some items
+q.Enqueue(P0, "some p0 item")
+q.Enqueue(P1, "a p1 item")
+q.Enqueue(P1, "another p1 item")
+
+// Start to consume
+q.Start()
+~~~
     
 ## License
     Copyright 2013 Google Inc. All Rights Reserved.
