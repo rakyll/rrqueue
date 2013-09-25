@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package rrqueue provides a container for priority queues
+// and a simple round-robin scheduled consumer.
 package rrqueue
 
 import (
@@ -21,6 +23,8 @@ import (
 )
 
 var (
+	// ErrQueueEmpty represents a failed Dequeue because
+	// there are not queued items available.
 	ErrQueueEmpty = errors.New("queue is empty")
 )
 
@@ -29,11 +33,18 @@ type RRQueue struct {
 	queues [][]interface{}
 	locks  []sync.Mutex
 
+	// TickInterval represents how frequently
+	// consumer consumer will tick.
 	TickInterval time.Duration
-	Timeout      time.Duration
-	Fn           func(interface{})
+	// Timeout represents the max duration a consumer
+	// function should consume on an item.
+	Timeout time.Duration
+	// Fn represents a function that will consume
+	// queued items.
+	Fn func(interface{})
 }
 
+// New returns a new rr queue instance.
 func New(n int) *RRQueue {
 	return &RRQueue{
 		TickInterval: time.Microsecond,
@@ -43,6 +54,7 @@ func New(n int) *RRQueue {
 	}
 }
 
+// Enqueue puts the given item to its priority queue
 func (p *RRQueue) Enqueue(pr int, item interface{}) error {
 	p.locks[pr].Lock()
 	defer p.locks[pr].Unlock()
@@ -51,6 +63,9 @@ func (p *RRQueue) Enqueue(pr int, item interface{}) error {
 	return nil
 }
 
+// Dequeue retrieves an items from the given priority
+// queue. It returns ErrQueueEmpty if the priorty queue
+// has no elements.
 func (p *RRQueue) Dequeue(pr int) (interface{}, error) {
 	p.locks[pr].Lock()
 	defer p.locks[pr].Unlock()
@@ -65,6 +80,9 @@ func (p *RRQueue) Dequeue(pr int) (interface{}, error) {
 	return item, nil
 }
 
+// Start initiates the round robin processing, runs forever
+// to consume queued items. It waits TickInterval before
+// starting a new pass.
 func (p *RRQueue) Start() {
 	done := make(chan bool, 1)
 	go func() {
