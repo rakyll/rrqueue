@@ -2,6 +2,8 @@
 
 `rrqueue` is a priority queue implementation with round-robin like scheduling to consume the enqueued items. It retrieves a single item from each priority queue on each tick and process the item with the provided func. Equal time slices are allocated for each queue on each tick, you're expected to put less items to high priority queues to avoid starvation. 
 
+[![Build Status](https://travis-ci.org/rakyll/rrqueue.png?branch=master)](https://travis-ci.org/rakyll/rrqueue)
+
 ~~~ go
 import (
     "github.com/rakyll/rrqueue"
